@@ -5,7 +5,6 @@ header("Content-type: application/json");
 class FeedbackUtil{
     function getUserByEmail($email){
         global $DB;
-        echo($email);
         return $DB->get_record("user", ["email" => $email]);
     }
     function insertFeebackCompletion($feedback){
