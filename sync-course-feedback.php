@@ -33,11 +33,9 @@ foreach ($feedbackCompletions as $feebackCompletionId => $feedbackCompletion) {
         $feedback->id,
         $user->id
     );
-    print_r($comp);
-    echo($feedback->id);
-    echo($user->id);
-    
-    return;
+    if($comp){
+        continue;
+    }
 
     $insertFeebackCompletion = $feedbackUtil->insertFeebackCompletion(array(
         "courseid" => $courseId,
