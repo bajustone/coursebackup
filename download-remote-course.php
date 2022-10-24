@@ -23,7 +23,10 @@ if (!is_writable($destination_dir) or !is_dir($destination_dir)) {
         $file_final_name =$destination_dir . DIRECTORY_SEPARATOR . $file_name;
         
         try {
+                echo("start downloading");
                 $course_file = file_get_contents($url);
+                echo("download complete: $url");
+                die();
                 if(!$course_file){
                        $resultObj->message = "could not download course files";
                        echo (json_encode($resultObj));

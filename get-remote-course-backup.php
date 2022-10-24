@@ -45,10 +45,10 @@ if (!empty($dir)) {
             serve_file($file_web_path);
             exit(0);
         } else {
-            //mtrace("Destination directory does not exist or is not writable. Leaving the backup in the course backup file area.");
+            mtrace("Destination directory does not exist or is not writable. Leaving the backup in the course backup file area.");
         }
     }
 } else {
-    //mtrace("Backup completed, the new file is listed in the backup area of the given course");
+    mtrace("Backup completed, the new file is listed in the backup area of the given course");
 }
 $bc->destroy();
