@@ -21,6 +21,7 @@ $feebackUtil = new FeedbackUtil();
 foreach ($users as $feebackCompletionId => $user) {
     # code...
     $remoteUser = $feebackUtil->getUserByEmail($user->email);
+    echo("----------------");
     echo(json_encode($remoteUser));
 }
 
