@@ -7,16 +7,25 @@ class FeedbackUtil{
         global $DB;
         return $DB->get_record("user", ["email" => $email]);
     }
+    function getFeedbackByCourse($courseid, $name){
+        global $DB;
+        return $DB->get_record("feedback", array(
+            "course" => $courseid,
+            "name" => $name
+        ));
+    }
     function insertFeebackCompletion($feedback){
         global $DB;
-        return $DB->insert_record("feedback_completed", array(
-            "courseid" => $feedback->courseid,
-            "userid" =>  $feedback->userid,
-            "feedback" =>  $feedback->feedback,
-            "anonymous_response" =>  $feedback->anonymous_response,
-            "random_response" =>  $feedback->random_response
+        $feedbackData = array(
+            "courseid" => $feedback["courseid"],
+            "userid" =>  $feedback["userid"],
+            "feedback" =>  $feedback["feedback"],
+            "anonymous_response" =>  $feedback["anonymous_response"],
+            "random_response" =>  $feedback["random_response"],
+            "timemodified" => $feedback["timemodified"]
 
-        ));
+        );
+        return $DB->insert_record("feedback_completed", $feedbackData);
     }
     function insertFeedbackValue($value){
         global $DB;
@@ -37,9 +46,10 @@ class FeedbackUtil{
         ));
 
     }
+    function getFeedbackById($id){
+        global $DB;
+        return $DB->get_record("feedback", array(
+            "id" => $id
+        ));
+    }
 }
-
-$userUtil = new FeedbackUtil();
-$position = $userUtil->getFeedbackItemByPosition(3, 2);
-
-echo(json_encode($position));

@@ -1,7 +1,7 @@
 <?php
 require_once("./config.php");
 header("Content-type: application/json");
-
+require_once("./feeback-sync-util.php");
 
 
 $url = new moodle_url($_SERVER["REQUEST_URI"]);
@@ -18,7 +18,25 @@ $resultObj = new stdClass;
 
 $enrolledUsers = get_enrolled_users($context);
 
-$feedbackCompletions = $DB->get_records("feedback_completed");
+
+$getFeedbackCompletions = function(){
+    global $DB;
+   
+    $f = $DB->get_records("feedback_completed");
+    $addFeedbackName = function($v){
+        $feedbackUtil = new FeedbackUtil();
+        $feedback = $feedbackUtil->getFeedbackById($v->feedback);
+        if($feedback){
+            $v->feedback_name = $feedback->name;
+        }
+        return $v;
+    };
+    return array_map(fn($v)=> $addFeedbackName($v), $f);
+
+};
+
+$feedbackCompletions = $getFeedbackCompletions();
+// array_map($addFeedbackName, );
 $feedbackValues= $DB->get_records("feedback_value");
 
 $f = function($v, $enrolledUsers){
@@ -35,7 +53,11 @@ $f = function($v, $enrolledUsers){
 };
 
 $g = function($k, $capUses){
+    global $DB;
+    // $feedbackUtil = new FeedbackUtil();
+    // $feedback = $feedbackUtil->getFeedbackById($k->feedback);
     $a = isset($capUses[$k->id]);
+   
     return $a;
 };
 $h = function($k, $capUses){
@@ -48,10 +70,10 @@ function getFeedbackItems(){
     $capFeedbackItems = [];
     foreach ($items as $key => $item) {
        if(isset($capFeedbackItems[$item->feedback])){
-        $capFeedbackItems[$item->feedback][$item->position] = $item;
+        $capFeedbackItems[$item->feedback][$item->id] = $item;
         }else{
             $capFeedbackItems[$item->feedback] = [];
-            $capFeedbackItems[$item->feedback][$item->position] = $item;
+            $capFeedbackItems[$item->feedback][$item->id] = $item;
        }
     }
     return $capFeedbackItems;
