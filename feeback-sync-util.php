@@ -1,6 +1,7 @@
 <?php 
 require_once("./config.php");
 header("Content-type: application/json");
+header("Access-Control-Allow-Origin: *");
 
 class FeedbackUtil{
     function getUserByEmail($email){

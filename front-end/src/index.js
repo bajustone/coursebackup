@@ -2,6 +2,7 @@ import {LitElement, css, svg, html} from 'lit';
 import { doneIcon, loadingIcon } from './icons.js';
 import LoadingElt from "./loading.js";
 // import ForumSync from './forum-sync.js';
+import {remoteAPIUrl} from "./cap-data.json";
 
 
 const COURSES_ENDPOINT = "get-remote-courses.php";
@@ -11,6 +12,8 @@ const DELETE_ALL_COURSES_ENDPOINT = "delete-courses.php";
 const SYNC_GRADES_ENDPOINT = "sync-to-online.php?course_id=";
 const SYNC_PAGE_LINK = "/local/coursebackup/manage.php";
 const IS_USER_ADMIN_LINK = "/local/coursebackup/get-current-user.php";
+const COURSE_FEEDBACK_LINK = "/local/coursebackup/course-feedback.php";
+const COURSE_FEEDBACK_SYNC_LINK = "/local/coursebackup/sync-course-feedback.php";
 
 
 const _isAdmin = async () => {
@@ -267,16 +270,27 @@ export class App extends LitElement{
     }
     async _uploadUserData(courseId){
 
-      
-      const request = await fetch(`${SYNC_GRADES_ENDPOINT}${courseId}`);
-      
+      const url = `${SYNC_GRADES_ENDPOINT}${courseId}`;
+      const request = await fetch(url);
+      const coursefeedbackResponse = await fetch(`${COURSE_FEEDBACK_LINK}?course_id=${courseId}`);
+      const coursefeedback = await coursefeedbackResponse.json();
+      const coursefeedbackSyncResponse = await fetch(`${remoteAPIUrl}${COURSE_FEEDBACK_SYNC_LINK}`, {
+        method: "post",
+        body: JSON.stringify(coursefeedback)
+      });
+      const coursefeedbackSync = await coursefeedbackSyncResponse();
+     console.log(coursefeedbackSync); 
+
+
 
       try {
+        
         const json = await request.json();
+
         console.log(json);
         return json;
       } catch (error) {
-        console.log( error);
+        console.error( error);
       }
 
       

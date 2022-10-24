@@ -35,6 +35,9 @@ class sync_course{
 
             if(count( $gradesData)){
                 $requestData = array_merge(WEB_SERVICE_REQUEST_OPTIONS, $gradesData);
+                // echo( json_encode($requestData["courseid"]));
+                // echo( json_encode($requestData));
+                // echo("---------------");
                 $fResult[] = $this->send_backup($requestData);
             }
             
@@ -108,15 +111,18 @@ class sync_course{
         foreach ($grades as $grade) {
             $local_user = $local_users[$grade->userid];
             $remote_user = $remote_users[$local_user->email];
-            $gradeData =  array(
-              "source" =>  $activity->name,
-              "courseid" => $grade->courseid,
-              "component" => "mod_$activity->name",
-              "itemnumber" => 0,
-              "activityid" => $activity->remoteModuleId,
-              "grades[$numberOfGrades][studentid]" => $remote_user->id,
-              "grades[$numberOfGrades][grade]" => $grade->rawgrade
-            );
+            if($remote_user->id !== null){
+                $gradeData =  array(
+                    "source" =>  $activity->name,
+                    "courseid" => $grade->courseid,
+                    "component" => "mod_$activity->name",
+                    "itemnumber" => 0,
+                    "activityid" => $activity->remoteModuleId,
+                    "grades[$numberOfGrades][studentid]" => $remote_user->id,
+                    "grades[$numberOfGrades][grade]" => $grade->rawgrade
+                  );
+            }
+            
 
             
             $gradesData = array_merge($gradesData, $gradeData);
