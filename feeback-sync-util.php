@@ -29,14 +29,16 @@ class FeedbackUtil{
     }
     function insertFeedbackValue($value){
         global $DB;
-        $DB->insert_record("feedback_value", array(
-                "course_id" => $value->course_id,
-                "item" =>  $value->item,
-                "completed" =>  $value->completed,
-                "tmp_completed" =>  $value->tmp_completed,
-                "value" =>  $value->value
-            )
+        
+        $feedbackValue = array(
+            "course_id" => $value["course_id"],
+            "item" =>  $value["item"],
+            "completed" =>  $value["completed"],
+            "tmp_completed" =>  $value["tmp_completed"],
+            "value" =>  $value["value"]
         );
+
+        $DB->insert_record("feedback_value", $feedbackValue);
     }
     function getFeedbackItemByPosition($feedback, $position){
         global $DB;

@@ -21,14 +21,8 @@ $feedbackItems = (array)$requestBody->feedbackItems;
 $feedbackValues = $requestBody->feedbackValues;
 $feedbackUtil = new FeedbackUtil();
 
-// foreach ($users as $feebackCompletionId => $user) {
-//     # code...
-//     $remoteUser = $feebackUtil->getUserByEmail($user->email);
-//     echo(json_encode($remoteUser));
-// }
+$success = true;
 foreach ($feedbackCompletions as $feebackCompletionId => $feedbackCompletion) {
-    # code...
-    // echo($feedbackCompletion->feedback_name);
     $capFeedbackId = $feedbackCompletion->feedback;
 
     $feedback = $feedbackUtil->getFeedbackByCourse($courseId, $feedbackCompletion->feedback_name);
@@ -36,34 +30,34 @@ foreach ($feedbackCompletions as $feebackCompletionId => $feedbackCompletion) {
     $user = $feedbackUtil->getUserByEmail($capUser->email);
     $saveFeedbackCompletion = null;
 
-    // $insertFeebackCompletion = $feedbackUtil->insertFeebackCompletion(array(
-    //     "courseid" => $courseId,
-    //     "userid" =>  $user->id,
-    //     "feedback" =>  $feedback->id,
-    //     "anonymous_response" =>  $feedbackCompletion->anonymous_response,
-    //     "random_response" =>  $feedbackCompletion->random_response,
-    //     "timemodified" => $feedbackCompletion->timemodified
-    // ));
+    $insertFeebackCompletion = $feedbackUtil->insertFeebackCompletion(array(
+        "courseid" => $courseId,
+        "userid" =>  $user->id,
+        "feedback" =>  $feedback->id,
+        "anonymous_response" =>  $feedbackCompletion->anonymous_response,
+        "random_response" =>  $feedbackCompletion->random_response,
+        "timemodified" => $feedbackCompletion->timemodified
+    ));
     foreach ($feedbackValues as $key => $value) {
-        # code...
-        
         $items = (array)$feedbackItems[$capFeedbackId];
         $item =  $items[$value->item];
         $remoteItem = $feedbackUtil->getFeedbackItemByPosition(
             $feedback->id,
             $item->position
         );
-        print_r($remoteItem);
+        $feedbackValue = $feedbackUtil->insertFeedbackValue(array(
+            "course_id" => $courseId,
+            "item" =>  $remoteItem->id,
+            "completed" =>  $insertFeebackCompletion,
+            "tmp_completed" =>  $value->tmp_completed,
+            "value" =>  $value->value
+        ));
+        
     }
-    
-    // print_r($insertFeebackCompletion);
-    // $a = $users->user;
-    // $remoteUser = $feebackUtil->getUserByEmail($user->email);
-    // echo(json_encode($feebackCompletionId));
-    // echo(json_encode($insertFeebackCompletion));
-
-    // echo(json_encode($feedbackCompletion));
 }
 
 
-// echo(json_encode($users));
+echo(json_encode([
+    "success"=> $success,
+    "message" => "success"
+]));
