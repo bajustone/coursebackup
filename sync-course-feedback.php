@@ -28,7 +28,16 @@ foreach ($feedbackCompletions as $feebackCompletionId => $feedbackCompletion) {
     $feedback = $feedbackUtil->getFeedbackByCourse($courseId, $feedbackCompletion->feedback_name);
     $capUser = $users->$feebackCompletionId;
     $user = $feedbackUtil->getUserByEmail($capUser->email);
-    $saveFeedbackCompletion = null;
+
+    $comp = $feedbackUtil->getFeedbackCompletionForUser(
+        $feedback->id,
+        $user->id
+    );
+    print_r($comp);
+    echo($feedback->id);
+    echo($user->id);
+    
+    return;
 
     $insertFeebackCompletion = $feedbackUtil->insertFeebackCompletion(array(
         "courseid" => $courseId,

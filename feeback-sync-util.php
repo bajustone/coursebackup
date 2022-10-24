@@ -27,6 +27,13 @@ class FeedbackUtil{
         );
         return $DB->insert_record("feedback_completed", $feedbackData);
     }
+    function getFeedbackCompletionForUser($feedbackid, $userId){
+        global $DB; 
+        return $DB->get_record("feedback_completed", array(
+            "feedback" => $feedbackid,
+            "userid" => $userId
+        ));
+    }
     function insertFeedbackValue($value){
         global $DB;
         
