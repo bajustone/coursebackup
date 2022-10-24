@@ -67,7 +67,8 @@ $feedbackItems = getFeedbackItems();
 $resultObj->feedbackCompletions = $capCompletions;
 $resultObj->feedbackItems = $feedbackItems;
 $resultObj->feedbackValues= $capFeedbackValues;
-$resultObj->user = $capUses;
+$resultObj->users = $capUses;
+$resultObj->courseId = $course_id;
 
 
 
