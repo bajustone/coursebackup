@@ -8,9 +8,11 @@ if($method !== "POST"){
     echo(json_encode($response));
     die();
 }
+$bodyText = file_get_contents('php://input');
+$requestBody = json_decode($json);
 
 $response = new stdClass;
 $response->method = $method;
 
 
-echo(json_encode($response));
+echo(json_encode($requestBody));
