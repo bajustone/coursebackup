@@ -6,7 +6,15 @@ require_once("./feeback-sync-util.php");
 
 $url = new moodle_url($_SERVER["REQUEST_URI"]);
 $course_id = (int) $url->get_param("course_id");
-$context = context_course::instance($course_id);
+$context = null;
+try {
+    $context = context_course::instance($course_id);
+} catch (\Throwable $th) {
+   return json_encode([
+    "message" => "course not found"
+   ]);
+   die();
+}
 
 if(!$course_id){
     echo(json_encode(["message" => "course_id not found"]));

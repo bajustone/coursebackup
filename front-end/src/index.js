@@ -121,6 +121,7 @@ export class App extends LitElement{
   static properties = {
     _loading: {state: true}
   };
+  
 
   constructor(){
     super();
@@ -130,7 +131,7 @@ export class App extends LitElement{
     this.isAdmin = false;
     this.online = navigator.onLine;
     this.currentCourse;
-    
+    this.selectdCourses = new Map(); 
   }
   _offline(){
     this.online = false;
@@ -208,6 +209,7 @@ export class App extends LitElement{
               <!-- <th>Course Id</th> -->
               <th>Course name</th>
               <th>Description</th>
+              <th><input type=checkbox disabled/> </th>
             </tr>
           </thead>
           <tbody>
@@ -226,14 +228,28 @@ export class App extends LitElement{
                 <!-- <td>${course.id}</td> -->
                 <td>${course.fullname}</td>
                 <td>${descriptionElt}</td>
+                <td><input @change=${evt=>this._courseSelectionChanged(evt, course)} .checked=${this.selectdCourses.has(course.id) }
+                 type="checkbox" /></td>
               </tr>`;
             })}
           </tbody>
         </table>
         `;
     }
-    async deleteAllCourses(){
-      const response = await fetch(DELETE_ALL_COURSES_ENDPOINT);
+    _courseSelectionChanged(evt, course){
+      const selected = evt.target.checked;
+      if(selected){
+        this.selectdCourses.set(`${course.id}`, course);
+        return;
+      }
+      if(!this.selectdCourses.has(`${course.id}`)) return;
+      this.selectdCourses.delete(`${course.id}`);
+      
+    }
+    async deleteAllCourses(courseId){
+      const url = `${DELETE_ALL_COURSES_ENDPOINT}?course_id=${courseId}`;
+     
+      const response = await fetch(url);
       const res = await response.json();
       console.log("Delete existing course", res);
     }
@@ -242,11 +258,13 @@ export class App extends LitElement{
       this.loading = true;
       this.requestUpdate();
       await this._uploadAllCoursesUsersData();
-      await this.deleteAllCourses();
       this.loading = false;
       this.requestUpdate();
-     for (const course of Object.values(this._courses)) {
+     
+     for (const course of this.selectdCourses.values()) {
        if(course.id == 1) continue;
+      
+       await this.deleteAllCourses(course.id);
        course.downloading = true;
        this._courses[course.id] = course;
        this.requestUpdate();
@@ -254,6 +272,7 @@ export class App extends LitElement{
        course.downloading = false;
        course.downloadComplete = true;
        this._courses[course.id] = course;
+       console.log("dowload completed: ", res);
        this.requestUpdate();
 
      }
@@ -271,19 +290,22 @@ export class App extends LitElement{
     async _uploadUserData(courseId){
 
       const url = `${SYNC_GRADES_ENDPOINT}${courseId}`;
-      const request = await fetch(url);
-      const coursefeedbackResponse = await fetch(`${COURSE_FEEDBACK_LINK}?course_id=${courseId}`);
-      const coursefeedback = await coursefeedbackResponse.json();
-      const coursefeedbackSyncResponse = await fetch(`${remoteAPIUrl}${COURSE_FEEDBACK_SYNC_LINK}`, {
-        method: "post",
-        body: JSON.stringify(coursefeedback)
-      });
-      const coursefeedbackSync = await coursefeedbackSyncResponse();
-     console.log(coursefeedbackSync); 
-
+     
 
 
       try {
+        const request = await fetch(url);
+        // console.log("request: ", request);s
+        const coursefeedbackResponse = await fetch(`${COURSE_FEEDBACK_LINK}?course_id=${courseId}`);
+        
+        const coursefeedback = await coursefeedbackResponse.json();
+        const coursefeedbackSyncResponse = await fetch(`${remoteAPIUrl}${COURSE_FEEDBACK_SYNC_LINK}`, {
+          method: "post",
+          body: JSON.stringify(coursefeedback)
+        });
+        const coursefeedbackSync = await coursefeedbackSyncResponse.json();
+        console.log(coursefeedbackSync); 
+  
         
         const json = await request.json();
 
@@ -296,7 +318,8 @@ export class App extends LitElement{
       
     }
     async _uploadAllCoursesUsersData(){
-      for (const course of Object.values(this._courses)) {
+      for (const course of this.selectdCourses.values()) {
+        
         if(course.id == 1) continue;
         course.downloading = true;
         this._courses[course.id] = course;
